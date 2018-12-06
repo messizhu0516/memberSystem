@@ -22,13 +22,9 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
 import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Enumeration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,10 +41,8 @@ public class FileUtils {
 	 * @autor:chenssy
 	 * @date:2014年8月7日
 	 *
-	 * @param filePath
-	 *            指定的文件路径
-	 * @param isNew
-	 *            true：新建、false：不新建
+	 * @param filePath 指定的文件路径
+	 * @param isNew    true：新建、false：不新建
 	 * @return 存在返回TRUE，不存在返回FALSE
 	 */
 	public static boolean isExist(String filePath, boolean isNew) {
@@ -117,12 +111,9 @@ public class FileUtils {
 	 * @author : chenssy
 	 * @date : 2016年5月23日 下午12:41:59
 	 *
-	 * @param inputFile
-	 *            源文件
-	 * @param outputFile
-	 *            目的文件
-	 * @param isOverWrite
-	 *            是否覆盖文件
+	 * @param inputFile   源文件
+	 * @param outputFile  目的文件
+	 * @param isOverWrite 是否覆盖文件
 	 * @throws java.io.IOException
 	 */
 	public static void copy(File inputFile, File outputFile, boolean isOverWrite) throws IOException {
@@ -138,12 +129,9 @@ public class FileUtils {
 	 * @author : chenssy
 	 * @date : 2016年5月23日 下午12:43:24
 	 *
-	 * @param inputFile
-	 *            源文件
-	 * @param outputFile
-	 *            目的文件
-	 * @param isOverWrite
-	 *            是否覆盖文件
+	 * @param inputFile   源文件
+	 * @param outputFile  目的文件
+	 * @param isOverWrite 是否覆盖文件
 	 * @throws java.io.IOException
 	 */
 	private static void copyPri(File inputFile, File outputFile, boolean isOverWrite) throws IOException {
@@ -166,12 +154,9 @@ public class FileUtils {
 	 * @author : chenssy
 	 * @date : 2016年5月23日 下午12:44:07
 	 *
-	 * @param inputFile
-	 *            源文件
-	 * @param outputFile
-	 *            目的文件
-	 * @param isOverWrite
-	 *            是否覆盖
+	 * @param inputFile   源文件
+	 * @param outputFile  目的文件
+	 * @param isOverWrite 是否覆盖
 	 * @throws java.io.IOException
 	 */
 	private static void copySimpleFile(File inputFile, File outputFile, boolean isOverWrite) throws IOException {
@@ -202,8 +187,7 @@ public class FileUtils {
 	 * @author : chenssy
 	 * @date : 2016年5月23日 下午12:50:38
 	 *
-	 * @param file
-	 *            文件
+	 * @param file 文件
 	 * @return
 	 */
 	public static String getFileMD5(File file) {
@@ -235,8 +219,7 @@ public class FileUtils {
 	 * @author : chenssy
 	 * @date : 2016年5月23日 下午12:51:59
 	 *
-	 * @param file
-	 *            文件
+	 * @param file 文件
 	 * @return
 	 */
 	public static String getFileSuffix(String file) {
@@ -260,10 +243,8 @@ public class FileUtils {
 	 * @author : chenssy
 	 * @date : 2016年5月23日 下午12:56:05
 	 *
-	 * @param oldPath
-	 *            老文件
-	 * @param newPath
-	 *            新文件
+	 * @param oldPath 老文件
+	 * @param newPath 新文件
 	 */
 	public boolean renameDir(String oldPath, String newPath) {
 		File oldFile = new File(oldPath);// 文件或目录
@@ -301,10 +282,8 @@ public class FileUtils {
 
 	/**
 	 * @param response
-	 * @param filePath
-	 *            //文件完整路径(包括文件名和扩展名)
-	 * @param fileName
-	 *            //下载后看到的文件名
+	 * @param filePath //文件完整路径(包括文件名和扩展名)
+	 * @param fileName //下载后看到的文件名
 	 * @return 文件名
 	 */
 	public static void fileDownload(final HttpServletResponse response, String filePath, String fileName) throws Exception {
@@ -319,83 +298,12 @@ public class FileUtils {
 		outputStream.flush();
 		outputStream.close();
 		response.flushBuffer();
-
-	}
-
-	/**
-	 * @param inputFileName
-	 *            你要压缩的文件夹(整个完整路径)
-	 * @param zipFileName
-	 *            压缩后的文件(整个完整路径)
-	 */
-	public static void zip(String inputFileName, String zipFileName) throws Exception {
-		zip(zipFileName, new File(inputFileName));
-	}
-
-	private static void zip(String zipFileName, File inputFile) throws Exception {
-		ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
-		zip(out, inputFile, "");
-		out.flush();
-		out.close();
-	}
-
-	private static void zip(ZipOutputStream out, File f, String base) throws Exception {
-		if (f.isDirectory()) {
-			File[] fl = f.listFiles();
-			out.putNextEntry(new ZipEntry(base + "/"));
-			base = base.length() == 0 ? "" : base + "/";
-			for (int i = 0; i < fl.length; i++) {
-				zip(out, fl[i], base + fl[i].getName());
-			}
-		} else {
-			out.putNextEntry(new ZipEntry(base));
-			FileInputStream in = new FileInputStream(f);
-			int b;
-			while ((b = in.read()) != -1) {
-				out.write(b);
-			}
-			in.close();
-		}
-	}
-
-	@SuppressWarnings("rawtypes")
-	public static void unZipFiles(File zipFile, String descDir) throws IOException {
-		File pathFile = new File(descDir);
-		if (!pathFile.exists()) {
-			pathFile.mkdirs();
-		}
-		ZipFile zip = new ZipFile(zipFile);
-		for (Enumeration entries = zip.entries(); entries.hasMoreElements();) {
-			ZipEntry entry = (ZipEntry) entries.nextElement();
-			String zipEntryName = entry.getName();
-			InputStream in = zip.getInputStream(entry);
-			String outPath = (descDir + zipEntryName).replaceAll("\\*", "/");
-			// 判断路径是否存在,不存在则创建文件路径
-			File file = new File(outPath.substring(0, outPath.lastIndexOf('/')));
-			if (!file.exists()) {
-				file.mkdirs();
-			}
-			// 判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压
-			if (new File(outPath).isDirectory()) {
-				continue;
-			}
-			// 输出文件路径信息
-			OutputStream out = new FileOutputStream(outPath);
-			byte[] buf1 = new byte[1024];
-			int len;
-			while ((len = in.read(buf1)) > 0) {
-				out.write(buf1, 0, len);
-			}
-			in.close();
-			out.close();
-		}
 	}
 
 	/**
 	 * 创建目录
 	 * 
-	 * @param destDirName
-	 *            目标目录名
+	 * @param destDirName 目标目录名
 	 * @return 目录创建成功返回true，否则返回false
 	 */
 	public static boolean createDir(String destDirName) {
@@ -417,8 +325,7 @@ public class FileUtils {
 	/**
 	 * 删除文件
 	 * 
-	 * @param filePathAndName
-	 *            String 文件路径及名称 如c:/fqf.txt（删除文件）或路径（目录下所有文件及子目录下所有文件）
+	 * @param filePathAndName String 文件路径及名称 如c:/fqf.txt（删除文件）或路径（目录下所有文件及子目录下所有文件）
 	 */
 	public static void delFile(String filePathAndName) {
 		try {
@@ -459,8 +366,7 @@ public class FileUtils {
 	/**
 	 * 读取到字节数组0
 	 * 
-	 * @param filePath
-	 *            //路径
+	 * @param filePath //路径
 	 * @throws IOException
 	 */
 	public static byte[] getContent(String filePath) throws IOException {
@@ -492,7 +398,6 @@ public class FileUtils {
 	 * @throws IOException
 	 */
 	public static byte[] toByteArray(String filePath) throws IOException {
-
 		File f = new File(filePath);
 		if (!f.exists()) {
 			throw new FileNotFoundException(filePath);
@@ -529,12 +434,10 @@ public class FileUtils {
 	 * @throws IOException
 	 */
 	public static byte[] toByteArray2(String filePath) throws IOException {
-
 		File f = new File(filePath);
 		if (!f.exists()) {
 			throw new FileNotFoundException(filePath);
 		}
-
 		FileChannel channel = null;
 		FileInputStream fs = null;
 		try {
@@ -569,7 +472,6 @@ public class FileUtils {
 	 * @throws IOException
 	 */
 	public static byte[] toByteArray3(String filePath) throws IOException {
-
 		FileChannel fc = null;
 		RandomAccessFile rf = null;
 		try {
@@ -792,91 +694,27 @@ public class FileUtils {
 
 		}
 	}
-	
-	private static byte[] ZIP_HEADER_1 = new byte[] { 80, 75, 3, 4 };  
-    private static byte[] ZIP_HEADER_2 = new byte[] { 80, 75, 5, 6 }; 
-	
-    /** 
-     * 判断文件是否为一个压缩文件 
-     *  
-     * @param file 
-     * @return 
-     */  
-    public static boolean isArchiveFile(File file) {  
-        if(file == null){  
-            return false;  
-        }  
-        if (file.isDirectory()) {  
-            return false;  
-        }  
-        boolean isArchive = false;  
-        InputStream input = null;  
-        try {  
-            input = new FileInputStream(file);  
-            byte[] buffer = new byte[4];  
-            int length = input.read(buffer, 0, 4);  
-            if (length == 4) {  
-                isArchive = (Arrays.equals(ZIP_HEADER_1, buffer)) || (Arrays.equals(ZIP_HEADER_2, buffer));  
-            }  
-        } catch (IOException e) {  
-            e.printStackTrace();  
-        } finally {  
-            if (input != null) {  
-                try {  
-                    input.close();  
-                } catch (IOException e) {  
-                }  
-            }  
-        }  
-        return isArchive;  
-    }  
-    
-	public static File zipMultiFiles(File[] files, String outputFile) throws IOException {
-		// 如果files长度为0，zout.close()方法会抛异常： ZIP file must have at least one entry
-		if (files.length == 0) {
-			return null;
-		}
-		FileOutputStream out = null;
-		BufferedOutputStream buffOut = null;
-		ZipOutputStream zout = null;
-		try {
-			out = new FileOutputStream(outputFile);
-			buffOut = new BufferedOutputStream(out);
-			zout = new ZipOutputStream(buffOut);
-			for (int i = 0; i < files.length; i++) {
-				InputStream in = null;
-				BufferedInputStream buffIn = null;
-				try {
-					in = new FileInputStream(files[i]);
-					buffIn = new BufferedInputStream(in, 2048);
-					ZipEntry zipEntry = new ZipEntry(files[i].getName());
-					zout.putNextEntry(zipEntry);
-					int len = 0;
-					byte data[] = new byte[2048];
-					while ((len = buffIn.read(data)) != -1) {
-						zout.write(data, 0, len);
+
+	public static List<File> listAllFiles(String path) {
+		List<File> result = new ArrayList<File>();
+		File file = new File(path);
+		if (file.exists()) {
+			File[] files = file.listFiles();
+			if (null == files || files.length == 0) {
+				return null;
+			} else {
+				for (File file2 : files) {
+					if (file2.isDirectory()) {
+						listAllFiles(file2.getAbsolutePath());
+					} else {
+						result.add(file2);
 					}
-				} finally {
-					try {
-						zout.closeEntry();
-					} catch (IOException e) {
-					}
-					buffIn.close();
-					in.close();
 				}
 			}
-			return new File(outputFile);
-		} finally {
-			zout.close();
-			buffOut.close();
-			out.close();
+		} else {
+			return null;
 		}
+		return result;
 	}
-    
-	public static void main(String[] args) throws Exception {
-		File file = new File("C:\\Users\\pc\\Desktop\\war\\1.zip");
-//        System.out.println(isArchiveFile(file));
-		unZipFiles(file, "C:\\Users\\pc\\Desktop\\war\\ff\\");
-	}
-    
+
 }

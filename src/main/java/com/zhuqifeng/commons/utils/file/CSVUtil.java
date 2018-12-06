@@ -9,6 +9,7 @@
 package com.zhuqifeng.commons.utils.file;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,34 +27,25 @@ import java.util.List;
  * @see
  */
 public class CSVUtil {
-	private String fileName = null;
-	private BufferedReader br = null;
-	private List<String> list = new ArrayList<String>();
 
-	public CSVUtil() {
-
+	public static List<String> convertToList(String filePath) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(filePath));
+		return doConvert(br);
 	}
 
-	public CSVUtil(String fileName) throws Exception {
-		this.fileName = fileName;
-		br = new BufferedReader(new FileReader(fileName));
+	public static List<String> convertToList(File file) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(file));
+		return doConvert(br);
+	}
+
+	private static List<String> doConvert(BufferedReader br) throws Exception {
+		List<String> list = new ArrayList<String>();
 		String stemp;
 		while ((stemp = br.readLine()) != null) {
 			list.add(stemp);
 		}
-	}
-
-	public List<String> getList() {
+		br.close();
 		return list;
-	}
-
-	/**
-	 * 获取行数
-	 * 
-	 * @return
-	 */
-	public int getRowNum() {
-		return list.size();
 	}
 
 	/**
@@ -61,7 +53,7 @@ public class CSVUtil {
 	 * 
 	 * @return
 	 */
-	public int getColNum() {
+	public static int getColNum(List<String> list) {
 		if (!list.toString().equals("[]")) {
 			if (list.get(0).toString().contains(",")) {// csv为逗号分隔文件
 				return list.get(0).toString().split(",").length;
@@ -81,8 +73,8 @@ public class CSVUtil {
 	 * @param index
 	 * @return
 	 */
-	public String getRow(int index) {
-		if (this.list.size() != 0) {
+	public String getRow(List<String> list, int index) {
+		if (list.size() != 0) {
 			return (String) list.get(index);
 		} else {
 			return null;
@@ -95,13 +87,13 @@ public class CSVUtil {
 	 * @param index
 	 * @return
 	 */
-	public String getCol(int index) {
-		if (this.getColNum() == 0) {
+	public String getCol(List<String> list, int index) {
+		if (getColNum(list) == 0) {
 			return null;
 		}
 		StringBuffer sb = new StringBuffer();
 		String tmp = null;
-		int colnum = this.getColNum();
+		int colnum = getColNum(list);
 		if (colnum > 1) {
 			for (Iterator<String> it = list.iterator(); it.hasNext();) {
 				tmp = it.next();
@@ -125,9 +117,9 @@ public class CSVUtil {
 	 * @param col
 	 * @return
 	 */
-	public String getString(int row, int col) {
+	public static String getString(List<String> list, int row, int col) {
 		String temp = null;
-		int colnum = this.getColNum();
+		int colnum = getColNum(list);
 		if (colnum > 1) {
 			temp = list.get(row).toString().split(",")[col];
 		} else if (colnum == 1) {
@@ -138,17 +130,18 @@ public class CSVUtil {
 		return temp;
 	}
 
-	public void CsvClose() throws Exception {
-		this.br.close();
-	}
-
 	public static void main(String[] args) throws Exception {
-		CSVUtil util = new CSVUtil("C:\\Users\\Administrator\\Desktop\\test.csv");
-		int rowNum = util.getRowNum();
-		int colNum = util.getColNum();
-		for (int i = 0; i < rowNum; i++) {
-			for (int j = 0; j < colNum; j++) {
-				System.out.println("第" + i + "行，第" + j + "列:" + util.getString(i, j));
+		List<File> allFiles = FileUtils.listAllFiles("C:\\Users\\Administrator\\Desktop\\test");
+		if (allFiles != null && allFiles.size() > 0) {
+			for (File file : allFiles) {
+				System.out.println("---------------------------------------------------");
+				List<String> list = CSVUtil.convertToList(file);
+				int colNum = CSVUtil.getColNum(list);
+				for (int i = 0; i < list.size(); i++) {
+					for (int j = 0; j < colNum; j++) {
+						System.out.println("第" + i + "行，第" + j + "列:" + CSVUtil.getString(list, i, j));
+					}
+				}
 			}
 		}
 	}
