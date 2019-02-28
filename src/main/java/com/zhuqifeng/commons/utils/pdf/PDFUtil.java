@@ -10,16 +10,31 @@
 package com.zhuqifeng.commons.utils.pdf;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.pdfbox.io.RandomAccessRead;
+import org.apache.pdfbox.pdfparser.PDFParser;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
+import org.apache.pdfbox.text.PDFTextStripperByArea;
 
 import com.itextpdf.text.Image;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
+import com.microsoft.schemas.office.visio.x2012.main.PagesDocument;
 import com.zhuqifeng.commons.utils.date.DateUtil;
 
 /**
@@ -63,4 +78,34 @@ public class PDFUtil {
 			return null;
 		}
 	}
+	
+	 public static void main(String[] args) throws IOException {
+
+	        try (PDDocument document = PDDocument.load(new File("C:\\Users\\Administrator\\Desktop\\pdf\\3.pdf"))) {
+
+	            document.getClass();
+
+	            if (!document.isEncrypted()) {
+				
+	                PDFTextStripperByArea stripper = new PDFTextStripperByArea();
+	                stripper.setSortByPosition(true);
+
+	                PDFTextStripper tStripper = new PDFTextStripper();
+
+	                String pdfFileInText = tStripper.getText(document);
+	                //System.out.println("Text:" + st);
+
+					// split by whitespace
+	                String lines[] = pdfFileInText.split("\\r?\\n");
+	                for (String line : lines) {
+	                    if (line.contains("编号：")) {
+	                    	System.out.println(line.split("编号：")[1]);
+	                    }
+	                }
+
+	            }
+
+	        }
+
+	    }
 }
