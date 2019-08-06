@@ -1,7 +1,6 @@
 package com.zhuqifeng.controller.common;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.shiro.SecurityUtils;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.ServletRequestDataBinder;
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zhuqifeng.commons.base.DateEditor;
 import com.zhuqifeng.commons.base.StringEscapeEditor;
 import com.zhuqifeng.commons.enums.ResultEnum;
 import com.zhuqifeng.commons.shiro.ShiroUser;
@@ -49,7 +48,7 @@ public abstract class BaseController {
 		/**
 		 * 自动转换日期类型的字段格式
 		 */
-		binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"), true));
+		binder.registerCustomEditor(Date.class, new DateEditor());
 		/**
 		 * 防止XSS攻击
 		 */
